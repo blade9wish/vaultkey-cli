@@ -2,12 +2,24 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum VaultError {
-    #[error("Failed to read config file '{0}': {1}")]
-    ConfigRead(String, #[source] std::io::Error),
+    #[error("IO error: {0}")]
+    Io(#[from] std::io::Error),
 
-    #[error("Failed to parse config TOML: {0}")]
-    ConfigParse(String),
+    #[error("Config error: {0}")]
+    Config(String),
 
-    #[error("Config validation error: {0}")]
-    Validation(String),
+    #[error("Not found: {0}")]
+    NotFound(String),
+
+    #[error("Serialization error: {0}")]
+    Serialization(String),
+
+    #[error("Deserialization error: {0}")]
+    Deserialization(String),
+
+    #[error("GPG error: {0}")]
+    Gpg(String),
+
+    #[error("Bundle already exists: {0}")]
+    AlreadyExists(String),
 }
