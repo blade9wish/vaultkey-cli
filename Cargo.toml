@@ -1,0 +1,20 @@
+[package]
+name = "vaultkey-cli"
+version = "0.1.0"
+edition = "2021"
+description = "A lightweight CLI for managing encrypted secret bundles with TOML-based config and GPG backend support"
+license = "MIT"
+
+[[bin]]
+name = "vaultkey"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+thiserror = "1"
+anyhow = "1"
+
+[dev-dependencies]
+tempfile = "3"
