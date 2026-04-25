@@ -1,10 +1,11 @@
-//! vaultkey-cli library root — exposes modules for use in tests and integration.
-
-pub mod bundle;
 pub mod config;
-pub mod crypto;
 pub mod error;
-pub mod keyring;
-pub mod keyring_cmd;
-pub mod keyring_store;
+pub mod bundle;
+pub mod crypto;
 pub mod vault;
+pub mod keyring;
+pub mod keyring_store;
+pub mod keyring_cmd;
+pub mod audit;
+pub mod audit_store;
+pub mod audit_cmd;
