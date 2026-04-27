@@ -52,6 +52,12 @@ Export the encrypted bundle to a file:
 vaultkey export --out secrets.bundle.gpg
 ```
 
+Delete a secret from the bundle:
+
+```bash
+vaultkey delete API_KEY
+```
+
 ---
 
 ## Configuration
