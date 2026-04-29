@@ -88,3 +88,34 @@ fn test_missing_file_returns_error() {
     let result = VaultConfig::load("/nonexistent/path/vaultkey.toml");
     assert!(result.is_err());
 }
+
+#[test]
+fn test_multiple_secrets_load_correctly() {
+    let toml = r#"
+[vault]
+name = "multi-secret-vault"
+version = 1
+
+[gpg]
+key_id = "ABCD1234"
+armor = true
+
+[[secrets]]
+name = "db_password"
+file = "secrets/db.gpg"
+
+[[secrets]]
+name = "api_key"
+file = "secrets/api.gpg"
+
+[[secrets]]
+name = "tls_cert"
+file = "secrets/tls.gpg"
+"#;
+    let f = write_config(toml);
+    let cfg = VaultConfig::load(f.path()).expect("should load");
+    assert_eq!(cfg.secrets.len(), 3);
+    assert_eq!(cfg.secrets[0].name, "db_password");
+    assert_eq!(cfg.secrets[1].name, "api_key");
+    assert_eq!(cfg.secrets[2].name, "tls_cert");
+}
