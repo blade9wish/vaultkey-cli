@@ -66,6 +66,24 @@ armor = false
 }
 
 #[test]
+fn test_empty_gpg_key_id_fails_validation() {
+    let toml = r#"
+[vault]
+name = "my-vault"
+version = 1
+
+[gpg]
+key_id = ""
+armor = false
+"#;
+    let f = write_config(toml);
+    let result = VaultConfig::load(f.path());
+    assert!(result.is_err());
+    let msg = result.unwrap_err().to_string();
+    assert!(msg.contains("gpg.key_id"));
+}
+
+#[test]
 fn test_missing_file_returns_error() {
     let result = VaultConfig::load("/nonexistent/path/vaultkey.toml");
     assert!(result.is_err());
