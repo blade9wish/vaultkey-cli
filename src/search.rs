@@ -36,6 +36,18 @@ pub struct SearchResult {
     pub matched_in_value: bool,
 }
 
+impl SearchResult {
+    /// Returns a short human-readable summary of where the term matched.
+    pub fn match_location(&self) -> &'static str {
+        match (self.matched_in_key, self.matched_in_value) {
+            (true, true) => "key and value",
+            (true, false) => "key",
+            (false, true) => "value",
+            (false, false) => "nowhere",
+        }
+    }
+}
+
 pub fn search_bundle(bundle: &Bundle, query: &SearchQuery) -> Result<Vec<SearchResult>, VaultKeyError> {
     let mut results = Vec::new();
 
