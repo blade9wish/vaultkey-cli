@@ -22,12 +22,7 @@ pub fn gpg_encrypt(plaintext: &[u8], recipient: &str) -> Result<Vec<u8>> {
         .spawn()
         .map_err(|e| VaultKeyError::Crypto(format!("Failed to spawn gpg: {}", e)))?;
 
-    if let Some(stdin) = child.stdin.take() {
-        let mut stdin = stdin;
-        stdin
-            .write_all(plaintext)
-            .map_err(|e| VaultKeyError::Crypto(format!("Failed to write to gpg stdin: {}", e)))?;
-    }
+    write_to_stdin(&mut child, plaintext, "encrypt")?;
 
     let output = child
         .wait_with_output()
@@ -54,12 +49,7 @@ pub fn gpg_decrypt(ciphertext: &[u8]) -> Result<Vec<u8>> {
         .spawn()
         .map_err(|e| VaultKeyError::Crypto(format!("Failed to spawn gpg: {}", e)))?;
 
-    if let Some(stdin) = child.stdin.take() {
-        let mut stdin = stdin;
-        stdin
-            .write_all(ciphertext)
-            .map_err(|e| VaultKeyError::Crypto(format!("Failed to write to gpg stdin: {}", e)))?;
-    }
+    write_to_stdin(&mut child, ciphertext, "decrypt")?;
 
     let output = child
         .wait_with_output()
@@ -74,4 +64,19 @@ pub fn gpg_decrypt(ciphertext: &[u8]) -> Result<Vec<u8>> {
     }
 
     Ok(output.stdout)
+}
+
+/// Write data to the stdin of a spawned child process, then close the handle.
+/// The `op` parameter is used only for error messages (e.g. "encrypt" or "decrypt").
+fn write_to_stdin(
+    child: &mut std::process::Child,
+    data: &[u8],
+    op: &str,
+) -> Result<()> {
+    if let Some(mut stdin) = child.stdin.take() {
+        stdin
+            .write_all(data)
+            .map_err(|e| VaultKeyError::Crypto(format!("Failed to write to gpg stdin ({}): {}", op, e)))?;
+    }
+    Ok(())
 }
