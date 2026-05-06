@@ -76,3 +76,24 @@ pub fn cmd_show_key(store: &KeyringStore, alias: &str) -> Result<(), VaultKeyErr
         ))),
     }
 }
+
+/// Rename an existing key alias in the keyring.
+///
+/// The fingerprint and all other fields are preserved; only the alias changes.
+pub fn cmd_rename_key(
+    store: &KeyringStore,
+    old_alias: &str,
+    new_alias: &str,
+) -> Result<(), VaultKeyError> {
+    let mut keyring = store.load()?;
+    let mut entry = keyring
+        .get(old_alias)
+        .cloned()
+        .ok_or_else(|| VaultKeyError::Config(format!("Key alias '{}' not found", old_alias)))?;
+    keyring.remove(old_alias)?;
+    entry.alias = new_alias.to_string();
+    keyring.add(entry)?;
+    store.save(&keyring)?;
+    println!("Key '{}' renamed to '{}'.", old_alias, new_alias);
+    Ok(())
+}
